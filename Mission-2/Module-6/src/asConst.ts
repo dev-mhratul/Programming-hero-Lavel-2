@@ -21,3 +21,4 @@ const userRole=(role: typeof user[keyof typeof user])=>{
 // 
 const userL= userRole(user.Admin)
 console.log(userL)
+
