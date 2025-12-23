@@ -1,69 +1,152 @@
-import express, { json, Request, Response } from "express";
-import { Pool } from "pg";
-import dotenv from 'dotenv';
-import path from 'path'; 
-const app = express();
-const port = 5000;
+import express, { json, NextFunction, Request, Response } from "express";
+import config from "./config";
+import initDB, { pool } from "./config/db";
+import logger from "./middleware/logger";
+import { userRoute } from "./modules/user/user.routes";
 
-dotenv.config({path: path.join(process.cwd(), '.env')})
+const app = express();
+
 
 // parser
 app.use(express.json());
 
-// DB
-const pool = new Pool({
-  connectionString: `${process.env.CONECTION_STR}`,
-});
-
-const initDB = async () => {
-  try {
-    await pool.query(`
-      CREATE TABLE IF NOT EXISTS users(
-        id SERIAL PRIMARY KEY,
-        name VARCHAR(100) NOT NULL,
-        email VARCHAR(100) UNIQUE NOT NULL,
-        age INT,
-        phone VARCHAR(15),
-        address TEXT,
-        created_at TIMESTAMP DEFAULT NOW(),
-        updated_at TIMESTAMP DEFAULT NOW()
-      )
-    `);
-
-    await pool.query(`
-      CREATE TABLE IF NOT EXISTS todos(
-        id SERIAL PRIMARY KEY,
-        user_id INT REFERENCES users(id) ON DELETE CASCADE,
-        title VARCHAR(200) NOT NULL,
-        description TEXT,
-        completed BOOLEAN DEFAULT false,
-        due_date DATE,
-        created_at TIMESTAMP DEFAULT NOW(),
-        updated_at TIMESTAMP DEFAULT NOW()
-      )
-    `);
-
-    console.log("✅ Tables created successfully");
-  } catch (error) {
-    console.error("❌ DB init error:", error);
-  }
-};
+const port = config.PORT;
 
 
 initDB();
 
-app.get("/", (req: Request, res: Response) => {
+
+
+app.get("/",logger, (req: Request, res: Response) => {
   res.send("Hello World!55");
 });
 
-app.post("/", (req: Request, res: Response) => {
-  console.log(req.body);
+// 
+app.use("/users", userRoute)
 
-  res.status(201).json({
-    succec: true,
-    message: "i am ratul",
-  });
-});
+
+// app.post("/users", async(req: Request, res: Response) => {
+//   // console.log(req.body);
+//   const {name, email}= req.body;
+
+//   try{
+//     const result= await pool.query(`INSERT INTO users(name, email) VALUES($1, $2) RETURNING *`, [name, email])
+//     res.status(201).json({
+//       success: false,
+//       message: "data inserted success",
+//       data: result.rows[0]
+//     })
+//   }catch(err:any){
+//     res.status(500).json({
+//       success: false,
+//       message: err.message
+//     })
+//   }
+
+// });
+
+// 
+// app.get("/users", async(req: Request, res: Response)=>{
+//   try{
+//    const result = await pool.query(`SELECT * FROM users`)
+
+//    res.status(200).json({
+//     seccess: true,
+//     message: "users get successfully",
+//     data: result.rows
+//    })
+//   }catch(err:any){
+//     res.status(500).json({
+//       success: false,
+//       message: err.message
+//     })
+//   }
+// })
+
+// get id
+app.get("/users/:id", async(req:Request, res:Response)=>{
+  try{
+    const result= await pool.query(`SELECT * FROM users WHERE id=$1`, [req.params.id])
+
+    if(result.rows.length === 0){
+      res.status(404).json({
+        success: false,
+        message: "User not fund"
+      })
+    }
+    else{
+      res.status(200).json({
+        success: true,
+        message: "User fetched successfully",
+        data: result.rows[0]
+      })
+    }
+    console.log(result.rows)
+  }catch(err:any){
+    res.status(500).json({
+      success: false,
+      message: err.message
+    })
+  }
+})
+
+
+// users update`
+app.put("/users/:id", async(req:Request, res:Response)=>{
+  try{
+    const {name, email}= req.body;
+    const result= await pool.query(`UPDATE users SET name=$1, email= $2 WHERE id=$3 RETURNING *`, [name, email, req.params.id])
+
+    if(result.rows.length === 0){
+      res.status(404).json({
+        success: false,
+        message: "User not fund"
+      })
+    }
+    else{
+      res.status(200).json({
+        success: true,
+        message: "User fetched successfully",
+        data: result.rows[0]
+      })
+    }
+    console.log(result.rows)
+  }catch(err:any){
+    res.status(500).json({
+      success: false,
+      message: err.message
+    })
+  }
+})
+
+// user delete
+
+// get id
+app.delete("/users/:id", async(req:Request, res:Response)=>{
+  try{
+    const result= await pool.query(`DELETE FROM users WHERE id=$1`, [req.params.id])
+
+    if(result.rows.length === 0){
+      res.status(404).json({
+        success: false,
+        message: "User Delete successfully"
+      })
+    }
+    else{
+      res.status(200).json({
+        success: true,
+        message: "User fetched successfully",
+        data: result.rows[0]
+      })
+    }
+    console.log(result.rows)
+  }catch(err:any){
+    res.status(500).json({
+      success: false,
+      message: err.message
+    })
+  }
+})
 
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`);
