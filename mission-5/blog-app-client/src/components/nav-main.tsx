@@ -5,7 +5,8 @@ import {
   SidebarGroup,
   SidebarGroupLabel,
 } from "@/components/ui/sidebar"
-import { ChevronRightIcon } from "lucide-react"
+import Link from "next/link"
+
 
 export function NavMain({
   items,
@@ -24,6 +25,8 @@ export function NavMain({
   return (
     <SidebarGroup>
       <SidebarGroupLabel>Platform</SidebarGroupLabel>
+      <Link href={'/dashboard/write-blog'}>Write Blog</Link>
+      <Link href={'/dashboard/analytics'}>Analytics</Link>
 
     </SidebarGroup>
   )

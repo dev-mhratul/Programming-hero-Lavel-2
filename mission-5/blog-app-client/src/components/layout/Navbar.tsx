@@ -1,6 +1,6 @@
 "use client";
 
-import {  Menu, Zap } from "lucide-react";
+import {  Menu } from "lucide-react";
 
 import {
   Accordion,
@@ -68,6 +68,7 @@ const Navbar = ({
     { title: "Blog", url: "/blog" },
     { title: "About", url: "/about" },
     { title: "Dashboard", url: "/dashboard" },
+    { title: "Practice", url: "/marketing" },
 
   ],
   auth = {
