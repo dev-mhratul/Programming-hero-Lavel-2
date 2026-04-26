@@ -13,7 +13,9 @@ import {
   SidebarHeader,
   SidebarRail,
 } from "@/components/ui/sidebar"
-import { GalleryVerticalEndIcon, AudioLinesIcon, TerminalIcon, TerminalSquareIcon, BotIcon, BookOpenIcon, Settings2Icon, FrameIcon, PieChartIcon, MapIcon } from "lucide-react"
+import { FrameIcon, PieChartIcon, MapIcon } from "lucide-react"
+import { AdminRoutes } from "@/routes/adminRoutes"
+import { userRoutes } from "@/routes/userRoutes"
 
 // This is sample data.
 const data = {
@@ -23,13 +25,14 @@ const data = {
     avatar: "/avatars/shadcn.jpg",
   },
   teams: [
-    
+
   ],
   navMain: [
     {
       title: "Playground",
       url: "/",
-     
+
+
     }
   ],
   projects: [
@@ -60,14 +63,30 @@ const data = {
   ],
 }
 
-export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+export function AppSidebar({ user, ...props }: { user: { role: string } & React.ComponentProps<typeof Sidebar> }) {
+
+  let routes = []
+  switch (user.role) {
+    case "admin":
+      routes = AdminRoutes
+      break;
+    case "user":
+      routes = userRoutes
+      break;
+
+    default:
+      routes= []
+      break;
+  }
+  console.log(routes)
+  
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
         <TeamSwitcher teams={data.teams} />
       </SidebarHeader>
       <SidebarContent>
-        <NavMain items={data.navMain} />
+        <NavMain items={routes} />
         <NavProjects projects={data.projects} />
       </SidebarContent>
       <SidebarFooter>

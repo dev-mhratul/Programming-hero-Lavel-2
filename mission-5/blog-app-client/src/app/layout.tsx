@@ -2,7 +2,7 @@ import "./globals.css"
 
 import { ThemeProvider } from "@/provider/ThemeProvider" 
 import { TooltipProvider } from "@/components/ui/tooltip"
-import { Navbar } from "@/components/layout/Navbar"
+
 
 export default function RootLayout({
   children,
