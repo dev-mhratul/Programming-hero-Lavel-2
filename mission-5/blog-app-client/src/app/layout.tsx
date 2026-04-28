@@ -9,6 +9,7 @@ export default function RootLayout({
 }: {
   children: React.ReactNode
 }) {
+  
   return (
     // ✅ FIX 1: hydration warning fix (VERY IMPORTANT)
     <html lang="en" suppressHydrationWarning>
