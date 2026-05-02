@@ -1,9 +1,10 @@
+import { blogService } from '@/services/blog.service'
 import React from 'react'
 
-function about() {
+export default async function about() {
+  const {data}= await blogService.getBlogPost()
+  console.log(data)
   return (
-    <div>about page </div>
+    <div>about</div>
   )
 }
-
-export default about
